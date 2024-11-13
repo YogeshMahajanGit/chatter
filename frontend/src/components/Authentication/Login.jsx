@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Stack,
   TextField,
@@ -12,16 +13,53 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Toast from "../Toast";
+import axios from "axios";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
+    setLoading(true);
+
+    if (!email || !password) {
+      <Toast />;
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        "http://127.0.0.1:8000/api/user/login",
+        {
+          email,
+          password,
+        },
+        config
+      );
+      // toest with Login successful
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+    } catch (error) {
+      //tosat with error ocuured!
+      console.log(error.response.data.message);
+      setLoading(false);
+    }
   };
 
   // Password show/hide toggle
@@ -76,9 +114,16 @@ function Login() {
         mt={2}
         sx={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}
       >
-        <Button variant="contained" color="primary" fullWidth type="submit">
+        <LoadingButton
+          variant="contained"
+          color="primary"
+          fullWidth
+          type="submit"
+          loading={loading}
+          onClick={handleSubmit}
+        >
           Login
-        </Button>
+        </LoadingButton>
         <Button variant="outlined" color="warning" fullWidth type="submit">
           Get Guest User Credentials
         </Button>
