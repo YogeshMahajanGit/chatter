@@ -56,7 +56,7 @@ const accessChat = asyncHandler(async (req, res) => {
   }
 });
 
-// fetches all chats
+// function to fetches all chats
 const fetchChats = asyncHandler(async (req, res) => {
   try {
     // find current user
@@ -79,7 +79,7 @@ const fetchChats = asyncHandler(async (req, res) => {
   }
 });
 
-// create group chat
+// function to create group chat
 const createGroupChat = asyncHandler(async (req, res) => {
   // check required thinks
   if (!req.body.users || !req.body.name) {
@@ -117,4 +117,85 @@ const createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { accessChat, fetchChats, createGroupChat };
+// function to re-name the group
+const renameGroup = asyncHandler(async (req, res) => {
+  const { chatId, chatName } = req.body;
+
+  const updateChatName = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      chatName,
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!updateChatName) {
+    res.status(404);
+    throw new Error("Chat not found");
+  } else {
+    res.json(updateChatName);
+  }
+});
+
+//function to add new group member
+const addToGroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // add to group
+  const added = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!added) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(added);
+  }
+});
+
+//function to remove from group
+const removeFromGroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // remove to group
+  const removed = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $pull: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!removed) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(removed);
+  }
+});
+
+module.exports = {
+  accessChat,
+  fetchChats,
+  createGroupChat,
+  renameGroup,
+  addToGroup,
+  removeFromGroup,
+};
