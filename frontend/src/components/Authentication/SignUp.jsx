@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Stack,
   TextField,
-  Button,
   Box,
   InputLabel,
   FormControl,
@@ -10,8 +10,11 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Toast from "../Toast";
+import axios from "axios";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -20,16 +23,85 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [pic, setPic] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ name, email, password, confirmPassword, pic });
+    setLoading(true);
+    if (!name || !email || !password || !confirmPassword) {
+      <Toast />;
+      setLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      <Toast />;
+      setLoading(false);
+      return;
+    }
+
+    // post call
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "http://127.0.0.1:8000/api/user",
+        {
+          name,
+          email,
+          password,
+          pic,
+        },
+        config
+      );
+      <Toast />;
+
+      // store in local storage
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+    } catch (error) {
+      console.log(error);
+      <Toast />;
+
+      setLoading(false);
+    }
   };
 
   // Profile Pic Details
-  const PostDetails = (file) => {
-    setPic(file);
+  const PostDetails = (pic) => {
+    setLoading(true);
+    if (pic === undefined) {
+      <Toast />;
+      return;
+    }
+
+    if (pic.type === "image/jpeg" || pic.type === "image/png") {
+      const data = new FormData();
+      data.append("file", pic);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "do5sjxvjl");
+      fetch("https://api.cloudinary.com/v1_1/do5sjxvjl/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    } else {
+      <Toast />;
+    }
   };
 
   // Password show/hide toggle
@@ -121,21 +193,29 @@ function SignUp() {
         </FormControl>
       </Box>
       <Box mb={2}>
-        <Button variant="contained" component="label">
+        <LoadingButton variant="contained" component="label">
           Upload Profile
           <input
             type="file"
             accept="image/*"
             hidden
             name="profilePic"
+            loading={loading}
             onChange={(e) => PostDetails(e.target.files[0])}
           />
-        </Button>
+        </LoadingButton>
       </Box>
       <Box mt={2}>
-        <Button variant="contained" color="primary" fullWidth type="submit">
-          Submit
-        </Button>
+        <LoadingButton
+          variant="contained"
+          color="primary"
+          fullWidth
+          type="submit"
+          loading={loading}
+          onClick={handleSubmit}
+        >
+          Sign Up
+        </LoadingButton>
       </Box>
     </Stack>
   );
