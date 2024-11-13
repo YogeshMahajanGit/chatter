@@ -1,10 +1,13 @@
 const express = require("express");
-
 const { authMiddleware } = require("../middlewares/authMiddleware");
+const { accessChat, fetchChats } = require("../controllers/chatControllers");
 
 const router = express.Router();
 
-// router.route("/").post(authMiddleware, accessChat).get(authMiddleware,fetchChats);
+router
+  .route("/")
+  .post(authMiddleware, accessChat)
+  .get(authMiddleware, fetchChats);
 
 // router.route("/group").post(authMiddleware,createGroupChat)
 
