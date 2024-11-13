@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Stack,
   TextField,
-  Button,
   Box,
   FormControl,
   InputLabel,
@@ -14,7 +13,7 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LoadingButton from "@mui/lab/LoadingButton";
-import Toast from "../Toast";
+import { showToast } from "../Toast";
 import axios from "axios";
 
 function Login() {
@@ -30,7 +29,7 @@ function Login() {
     setLoading(true);
 
     if (!email || !password) {
-      <Toast />;
+      showToast("warning", "Enter Email and Password.");
       setLoading(false);
       return;
     }
@@ -50,13 +49,13 @@ function Login() {
         },
         config
       );
-      // toest with Login successful
+      showToast("success", "Login Successful!.");
 
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
       navigate("/chats");
     } catch (error) {
-      //tosat with error ocuured!
+      showToast("error", `${error.responce.data.message}`);
       console.log(error.response.data.message);
       setLoading(false);
     }
@@ -124,9 +123,18 @@ function Login() {
         >
           Login
         </LoadingButton>
-        <Button variant="outlined" color="warning" fullWidth type="submit">
+        <LoadingButton
+          variant="outlined"
+          color="warning"
+          fullWidth
+          type="submit"
+          onClick={() => {
+            setEmail("guest@example.com");
+            setPassword("123456");
+          }}
+        >
           Get Guest User Credentials
-        </Button>
+        </LoadingButton>
       </Box>
     </Stack>
   );

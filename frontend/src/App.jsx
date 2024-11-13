@@ -1,12 +1,28 @@
 import "./App.css";
 import ChatPage from "./pages/ChatPage";
 import Homepage from "./pages/HomePage";
-// import Button from "@mui/material/Button";
 import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <div className="app">
+      <div>
+        <ToastContainer
+          style={{ width: "250px" }}
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          // transition="Flip"
+        />
+      </div>
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/chat" element={<ChatPage />} />

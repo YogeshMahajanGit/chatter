@@ -13,8 +13,8 @@ import {
 import LoadingButton from "@mui/lab/LoadingButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Toast from "../Toast";
 import axios from "axios";
+import { showToast } from "../Toast";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -31,12 +31,12 @@ function SignUp() {
     e.preventDefault();
     setLoading(true);
     if (!name || !email || !password || !confirmPassword) {
-      <Toast />;
+      showToast("warning", "All Fields are Required!");
       setLoading(false);
       return;
     }
     if (password !== confirmPassword) {
-      <Toast />;
+      showToast("error", "Wrong Password!");
       setLoading(false);
       return;
     }
@@ -58,7 +58,7 @@ function SignUp() {
         },
         config
       );
-      <Toast />;
+      showToast("success", "Register Successful!");
 
       // store in local storage
       localStorage.setItem("userInfo", JSON.stringify(data));
@@ -66,8 +66,7 @@ function SignUp() {
       navigate("/chats");
     } catch (error) {
       console.log(error);
-      <Toast />;
-
+      showToast("error", `${error.responce.data.message}`);
       setLoading(false);
     }
   };
@@ -76,7 +75,7 @@ function SignUp() {
   const PostDetails = (pic) => {
     setLoading(true);
     if (pic === undefined) {
-      <Toast />;
+      showToast("warning", "Please Select Profile Pic");
       return;
     }
 
@@ -92,7 +91,6 @@ function SignUp() {
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
-          console.log(data.url.toString());
           setLoading(false);
         })
         .catch((err) => {
@@ -100,7 +98,7 @@ function SignUp() {
           setLoading(false);
         });
     } else {
-      <Toast />;
+      showToast("warning", "Somthing Wrong!");
     }
   };
 
@@ -200,7 +198,7 @@ function SignUp() {
             accept="image/*"
             hidden
             name="profilePic"
-            loading={loading}
+            loading={loading ? "true" : undefined}
             onChange={(e) => PostDetails(e.target.files[0])}
           />
         </LoadingButton>
