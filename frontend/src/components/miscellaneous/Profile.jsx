@@ -8,9 +8,12 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { ChatState } from "../../context/chatProvider";
 import { blue } from "@mui/material/colors";
+import ProfileModal from "./ProfileModal";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const navigate = useNavigate();
 
   const open = Boolean(anchorEl);
   const handleClick = (e) => {
@@ -22,6 +25,12 @@ export default function Profile() {
 
   //
   const { user } = ChatState();
+
+  //function Logout
+  function handleLogout() {
+    localStorage.removeItem("userInfo");
+    navigate("/");
+  }
   return (
     <>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
@@ -47,7 +56,6 @@ export default function Profile() {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         slotProps={{
           paper: {
             elevation: 0,
@@ -79,12 +87,18 @@ export default function Profile() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar alt={user.name} sx={{ bgcolor: blue[400] }} src={user.pic} />{" "}
-          My Profile
+        <MenuItem>
+          <ProfileModal user={user}>
+            <Avatar
+              src="https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+              alt={user.name}
+              sx={{ bgcolor: blue[400] }}
+            ></Avatar>
+            My Profile
+          </ProfileModal>
         </MenuItem>
         <Divider />
-        <MenuItem>Logout</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </>
   );
