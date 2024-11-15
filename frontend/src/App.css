@@ -15,3 +15,13 @@
   align-items: center;
   gap: 1.5rem;
 }
+
+.chat-text {
+  font-size: larger;
+  font-family: "Work sans";
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+}

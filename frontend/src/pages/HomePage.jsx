@@ -1,15 +1,26 @@
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import TabsPage from "../components/TabsPage";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function Homepage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (user) {
+      navigate("/chats");
+    }
+  }, [navigate]);
+
   return (
     <Container
       maxWidth="xl"
       sx={{
         marginTop: "50px",
         display: "flex",
-        // justifyContent: "center",
         flexDirection: "column",
       }}
       className="app"

@@ -2,10 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ChatContext = createContext();
-const navigate = useNavigate();
 
 const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
+  const navigate = useNavigate();
 
   //get user info
   useEffect(() => {
@@ -16,7 +16,7 @@ const ChatProvider = ({ children }) => {
     if (!userInfo) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <ChatContext.Provider value={{ user, setUser }}>

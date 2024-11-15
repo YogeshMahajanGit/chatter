@@ -20,12 +20,11 @@ function App() {
           draggable
           pauseOnHover
           theme="light"
-          // transition="Flip"
         />
       </div>
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chats" element={<ChatPage />} />
       </Routes>
     </div>
   );
